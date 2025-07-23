@@ -1,0 +1,11 @@
+{
+  "name": "Dawn Dev Container",
+  // Tell the container that your code lives at /project
+  "workspaceFolder": "/project",
+
+  // After the container builds, install deps & start theme serve
+  "postCreateCommand": "npm install && npx shopify theme serve --store=$SHOPIFY_STORE --password=$SHOPIFY_PASSWORD",
+
+  // Expose the default Theme CLI port
+  "forwardPorts": [9292]
+}
