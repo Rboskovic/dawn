@@ -1,0 +1,243 @@
+{% comment %}
+  STHLM Header Search
+  Renders the prominent search bar similar to Smyths design
+{% endcomment %}
+
+<div class="sthlm-search-wrapper">
+  {%- if settings.predictive_search_enabled -%}
+    <predictive-search data-loading-text="{{ 'accessibility.loading' | t }}">
+  {%- endif -%}
+
+  <form action="{{ routes.search_url }}" method="get" role="search" class="sthlm-search-form">
+    <div class="sthlm-search__input-wrapper">
+      <input
+        id="Search-In-Header"
+        class="sthlm-search__input"
+        type="search"
+        name="q"
+        value="{{ search.terms | escape }}"
+        placeholder="{{ 'general.search.search' | t }}"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+        {%- if settings.predictive_search_enabled -%}
+          role="combobox"
+          aria-expanded="false"
+          aria-owns="predictive-search-results-list"
+          aria-controls="predictive-search-results-list"
+          aria-haspopup="listbox"
+          aria-autocomplete="list"
+          autocomplete="off"
+        {%- endif -%}
+      >
+
+      <input type="hidden" name="options[prefix]" value="last">
+
+      <button
+        type="submit"
+        class="sthlm-search__button"
+        aria-label="{{ 'general.search.search' | t }}"
+      >
+        <svg class="sthlm-search__icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        </svg>
+      </button>
+    </div>
+
+    {%- if settings.predictive_search_enabled -%}
+      <div class="predictive-search predictive-search--header" tabindex="-1" data-predictive-search>
+        <div class="predictive-search__loading-state">
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            class="spinner"
+            viewBox="0 0 66 66"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+          </svg>
+        </div>
+      </div>
+
+      <span class="predictive-search-status visually-hidden" role="status" aria-hidden="true"></span>
+    {%- endif -%}
+  </form>
+
+  {%- if settings.predictive_search_enabled -%}
+    </predictive-search>
+  {%- endif -%}
+</div>
+
+<style>
+  .sthlm-search-wrapper {
+    width: 100%;
+    max-width: 60rem;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .sthlm-search-form {
+    position: relative;
+    width: 100%;
+  }
+
+  .sthlm-search__input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 2.5rem;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s ease;
+  }
+
+  .sthlm-search__input-wrapper:focus-within {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .sthlm-search__input {
+    flex: 1;
+    padding: 1.2rem 2rem;
+    border: none;
+    background: transparent;
+    font-size: 1.6rem;
+    line-height: 1.4;
+    color: #333;
+    outline: none;
+  }
+
+  .sthlm-search__input::placeholder {
+    color: #666;
+    opacity: 1;
+  }
+
+  .sthlm-search__button {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    border: none;
+    padding: 1.2rem 2rem;
+    margin: 0.3rem;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 5rem;
+  }
+
+  .sthlm-search__button:hover {
+    background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  .sthlm-search__button:active {
+    transform: translateY(0);
+  }
+
+  .sthlm-search__icon {
+    color: #333;
+    display: block;
+  }
+
+  /* Predictive search styles */
+  .predictive-search {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+    max-height: 40rem;
+    overflow-y: auto;
+  }
+
+  .predictive-search__loading-state {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .spinner {
+    width: 2rem;
+    height: 2rem;
+    animation: spin 1s linear infinite;
+  }
+
+  .spinner .path {
+    stroke: #666;
+    stroke-linecap: round;
+    animation: dash 1.5s ease-in-out infinite;
+  }
+
+  @keyframes spin {
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes dash {
+    0% {
+      stroke-dasharray: 1, 150;
+      stroke-dashoffset: 0;
+    }
+    50% {
+      stroke-dasharray: 90, 150;
+      stroke-dashoffset: -35;
+    }
+    100% {
+      stroke-dasharray: 90, 150;
+      stroke-dashoffset: -124;
+    }
+  }
+
+  /* Mobile responsive */
+  @media screen and (max-width: 990px) {
+    .sthlm-search-wrapper {
+      max-width: none;
+      margin: 0 1rem;
+    }
+
+    .sthlm-search__input {
+      padding: 1rem 1.5rem;
+      font-size: 1.4rem;
+    }
+
+    .sthlm-search__button {
+      padding: 1rem 1.5rem;
+      min-width: 4.5rem;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .sthlm-search-wrapper {
+      margin: 1rem;
+    }
+
+    .sthlm-search__input {
+      padding: 0.8rem 1.2rem;
+      font-size: 1.3rem;
+    }
+
+    .sthlm-search__button {
+      padding: 0.8rem 1.2rem;
+      min-width: 4rem;
+    }
+
+    .sthlm-search__icon {
+      width: 1.8rem;
+      height: 1.8rem;
+    }
+  }
+
+  /* Hide search on very small screens - will show in mobile menu */
+  @media screen and (max-width: 480px) {
+    .sthlm-search-wrapper {
+      display: none;
+    }
+  }
+</style>

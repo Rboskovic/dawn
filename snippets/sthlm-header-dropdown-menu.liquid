@@ -1,0 +1,226 @@
+{% comment %}
+  STHLM Header Dropdown Menu
+  Renders a standard dropdown style menu for the header navigation
+{% endcomment %}
+
+<nav class="header__inline-menu">
+  <ul class="list-menu list-menu--inline" role="list">
+    {%- for link in section.settings.menu.links -%}
+      <li>
+        {%- if link.links != blank -%}
+          <header-menu>
+            <details id="Details-HeaderMenu-{{ forloop.index }}">
+              <summary
+                id="HeaderMenu-{{ link.handle }}"
+                class="header__menu-item list-menu__item link focus-inset"
+              >
+                <span class="header__menu-title{% if link.child_active %} header__active-menu-item{% endif %}">
+                  {{ link.title | escape }}
+                </span>
+                <svg class="icon icon-caret" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                  <path d="M7 10l5 5 5-5z"/>
+                </svg>
+              </summary>
+
+              <ul
+                id="HeaderMenu-MenuList-{{ forloop.index }}"
+                class="header__submenu list-menu list-menu--disclosure color-{{ section.settings.menu_color_scheme | default: 'scheme-1' }} gradient caption-large motion-reduce global-settings-popup"
+                role="list"
+                tabindex="-1"
+              >
+                {%- for childlink in link.links -%}
+                  <li>
+                    {%- if childlink.links == blank -%}
+                      <a
+                        id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}"
+                        href="{{ childlink.url }}"
+                        class="header__menu-item list-menu__item link link--text focus-inset caption-large{% if childlink.current %} list-menu__item--active{% endif %}"
+                        {% if childlink.current %}
+                          aria-current="page"
+                        {% endif %}
+                      >
+                        {{ childlink.title | escape }}
+                      </a>
+                    {%- else -%}
+                      <details id="Details-HeaderSubMenu-{{ link.handle }}-{{ childlink.handle }}">
+                        <summary
+                          id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}"
+                          class="header__menu-item link link--text list-menu__item focus-inset caption-large"
+                        >
+                          <span>{{ childlink.title | escape }}</span>
+                          <svg class="icon icon-caret" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                          </svg>
+                        </summary>
+
+                        <ul
+                          id="HeaderMenu-SubMenuList-{{ link.handle }}-{{ childlink.handle }}"
+                          class="header__submenu list-menu motion-reduce"
+                        >
+                          {%- for grandchildlink in childlink.links -%}
+                            <li>
+                              <a
+                                id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle }}"
+                                href="{{ grandchildlink.url }}"
+                                class="header__menu-item list-menu__item link link--text focus-inset caption-large{% if grandchildlink.current %} list-menu__item--active{% endif %}"
+                                {% if grandchildlink.current %}
+                                  aria-current="page"
+                                {% endif %}
+                              >
+                                {{ grandchildlink.title | escape }}
+                              </a>
+                            </li>
+                          {%- endfor -%}
+                        </ul>
+                      </details>
+                    {%- endif -%}
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </details>
+          </header-menu>
+        {%- else -%}
+          <a
+            id="HeaderMenu-{{ link.handle }}"
+            href="{{ link.url }}"
+            class="header__menu-item list-menu__item link focus-inset{% if link.current %} header__active-menu-item{% endif %}"
+            {% if link.current %}
+              aria-current="page"
+            {% endif %}
+          >
+            {{ link.title | escape }}
+          </a>
+        {%- endif -%}
+      </li>
+    {%- endfor -%}
+  </ul>
+</nav>
+
+<style>
+  .header__inline-menu {
+    grid-area: navigation;
+    display: none;
+  }
+
+  @media screen and (min-width: 990px) {
+    .header__inline-menu {
+      display: block;
+    }
+  }
+
+  .list-menu--inline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .header__menu-item {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    color: white;
+    text-decoration: none;
+    font-size: 1.6rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .header__menu-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+  }
+
+  .header__menu-title {
+    margin-right: 0.5rem;
+  }
+
+  .header__active-menu-item {
+    color: #ffd700;
+  }
+
+  .icon-caret {
+    transition: transform 0.2s ease;
+  }
+
+  details[open] > .header__menu-item .icon-caret {
+    transform: rotate(180deg);
+  }
+
+  /* Dropdown submenu styles */
+  .header__submenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 25rem;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    opacity: 0;
+    transform: translateY(-1rem);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    list-style: none;
+    padding: 1rem 0;
+    margin: 0;
+  }
+
+  details[open] > .header__submenu {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  .header__submenu .header__menu-item {
+    padding: 0.8rem 2rem;
+    color: #333;
+    font-size: 1.4rem;
+    justify-content: space-between;
+  }
+
+  .header__submenu .header__menu-item:hover {
+    background: rgba(30, 93, 188, 0.1);
+    color: #1e5dbc;
+  }
+
+  .list-menu__item--active {
+    color: #1e5dbc !important;
+    font-weight: 600;
+  }
+
+  /* Nested submenu styles */
+  .header__submenu .header__submenu {
+    top: 0;
+    left: 100%;
+    margin-left: 0.5rem;
+  }
+
+  .header__submenu .header__submenu .header__menu-item {
+    padding: 0.6rem 1.5rem;
+    font-size: 1.3rem;
+  }
+
+  /* Focus states */
+  .header__menu-item:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.8);
+    outline-offset: 2px;
+  }
+
+  .header__submenu .header__menu-item:focus-visible {
+    outline: 2px solid #1e5dbc;
+    outline-offset: 2px;
+  }
+
+  /* Mobile hide */
+  @media screen and (max-width: 990px) {
+    .header__inline-menu {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,271 @@
+{% comment %}
+  STHLM Header Icons
+  Renders the header icons: Wishlist, Account, and Cart/Basket
+{% endcomment %}
+
+<div class="header__icons-wrapper">
+  <div class="header__icons">
+    <!-- Wishlist Icon -->
+    <div class="header__icon-item">
+      <a
+        href="{{ pages.wishlist.url | default: '/pages/wishlist' }}"
+        class="header__icon header__icon--wishlist link focus-inset"
+        aria-label="{{ 'general.accessibility.wishlist' | t }}"
+      >
+        <svg
+          class="icon icon-heart"
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        <span class="header__icon-text">{{ 'general.accessibility.wishlist' | t }}</span>
+      </a>
+    </div>
+
+    <!-- Account/Login Icon -->
+    {%- if shop.customer_accounts_enabled -%}
+      <div class="header__icon-item">
+        <a
+          href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
+          class="header__icon header__icon--account link focus-inset"
+          aria-label="{%- if customer -%}{{ 'customer.account_fallback' | t }}{%- else -%}{{ 'customer.log_in' | t }}{%- endif -%}"
+        >
+          {%- if customer and customer.first_name != blank -%}
+            <!-- Show customer avatar or initial -->
+            <div class="header__account-avatar">
+              {%- if customer.image -%}
+                {{
+                  customer.image
+                  | image_url: width: 32, height: 32
+                  | image_tag: alt: customer.name, class: 'header__avatar-image'
+                }}
+              {%- else -%}
+                <span class="header__avatar-initial">{{ customer.first_name | slice: 0 | upcase }}</span>
+              {%- endif -%}
+            </div>
+          {%- else -%}
+            <!-- Show login icon -->
+            <svg class="icon icon-account" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+          {%- endif -%}
+
+          <span class="header__icon-text">
+            {%- if customer -%}
+              {{ customer.first_name | default: 'Account' | escape }}
+            {%- else -%}
+              {{ 'customer.log_in' | t }}
+            {%- endif -%}
+          </span>
+        </a>
+      </div>
+    {%- endif -%}
+
+    <!-- Cart/Basket Icon -->
+    <div class="header__icon-item header__icon-item--cart">
+      <a
+        href="{{ routes.cart_url }}"
+        class="header__icon header__icon--cart link focus-inset"
+        id="cart-icon-bubble"
+        aria-label="{{ 'templates.cart.cart' | t }} ({{ cart.item_count }})"
+      >
+        <svg
+          class="icon icon-cart"
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+
+        <span class="header__icon-text">{{ 'templates.cart.cart' | t }}</span>
+
+        {%- if cart.item_count > 0 -%}
+          <div class="cart-count-bubble">
+            <span aria-hidden="true">{{ cart.item_count }}</span>
+            <span class="visually-hidden">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
+          </div>
+        {%- endif -%}
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .header__icons-wrapper {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+  }
+
+  .header__icons {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .header__icon-item {
+    position: relative;
+  }
+
+  .header__icon {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    text-decoration: none;
+    padding: 0.8rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .header__icon:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    text-decoration: none;
+  }
+
+  .header__icon svg {
+    flex-shrink: 0;
+    display: block;
+  }
+
+  .header__icon-text {
+    font-size: 1.4rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* Account avatar styles */
+  .header__account-avatar {
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .header__avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .header__avatar-initial {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: white;
+  }
+
+  /* Cart count bubble */
+  .cart-count-bubble {
+    position: absolute;
+    top: 0.2rem;
+    right: 0.2rem;
+    background: #ff4444;
+    color: white;
+    border-radius: 50%;
+    min-width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1;
+    border: 2px solid white;
+  }
+
+  .cart-count-bubble span {
+    display: block;
+  }
+
+  /* Responsive behavior */
+  @media screen and (max-width: 990px) {
+    .header__icons {
+      gap: 1rem;
+    }
+
+    .header__icon {
+      padding: 0.6rem;
+    }
+
+    .header__icon-text {
+      display: none;
+    }
+
+    .header__icon svg {
+      width: 2.2rem;
+      height: 2.2rem;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .header__icons {
+      gap: 0.5rem;
+    }
+
+    .header__icon {
+      padding: 0.5rem;
+    }
+
+    .header__icon svg {
+      width: 2rem;
+      height: 2rem;
+    }
+
+    .cart-count-bubble {
+      min-width: 1.8rem;
+      height: 1.8rem;
+      font-size: 1.1rem;
+      top: 0;
+      right: 0;
+    }
+  }
+
+  /* Hide wishlist on very small screens */
+  @media screen and (max-width: 480px) {
+    .header__icon--wishlist {
+      display: none;
+    }
+  }
+
+  /* Focus states */
+  .header__icon:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.8);
+    outline-offset: 2px;
+  }
+
+  /* Animation for cart updates */
+  .cart-count-bubble {
+    animation: cartBubbleIn 0.3s ease-out;
+  }
+
+  @keyframes cartBubbleIn {
+    0% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.2);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+</style>
